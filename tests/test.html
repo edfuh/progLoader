@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <style type="text/css">
+    .r{border:1px solid turquoise; padding:8px; border-radius:5px; margin-bottom:5px;}
+  </style>
+  <link rel="stylesheet" href="styles.css" type="text/css" />
+</head>
+<body>
+  
+  <div id="dom" class="r"></div>
+  <div id="start" class="r"></div>
+  <div id="change" class="r"></div>
+  <div id="done" class="r"></div>
+  <div id="onload" class="r"></div>
+  
+  <img src="http://placekitten.com/300?v=0" />
+  <img src="http://placekitten.com/300?v=1" />
+  <img src="http://placekitten.com/300?v=2" />
+  <img src="http://placekitten.com/300?v=3" />
+  <img src="http://placekitten.com/300?v=4" />
+  <img src="http://placekitten.com/300?v=5" />
+  <img src="http://placekitten.com/300?v=6" />
+  <img src="http://placekitten.com/300?v=7" />
+  
+  <div style="background:url(http://placekitten.com/300?v=8);"> </div>
+  <div id="css-bg-test"></div>
+  
+  <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+  <script type="text/javascript" src="../jquery-progloader.js"></script>
+  
+  <script>
+  (function () {
+      var startTime = Date.now(),
+          imgIdx = 0;
+
+      $(document).ready(function (){
+          $('#dom').text('DOM ' + (Date.now() - startTime));
+      });
+
+      window.onload = function () {
+          $('#onload').text('onload ' + (Date.now() - startTime));
+      };
+
+      $.progLoader({
+          timeout : 7000,
+          onStart : function () {
+              $('#start').text('start ' + (Date.now() - startTime));
+          },
+          onChange : function () {
+              console.log(arguments);
+              $('#change').html($('#change').html() + (imgIdx++) + ' change ' + (Date.now() - startTime) + '<br/>');
+          },
+          onDone : function () {
+              $('#done').text('done ' + (Date.now() - startTime));
+          }
+      });
+  })();
+  </script>
+  
+</body>
+</html>

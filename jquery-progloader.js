@@ -5,11 +5,9 @@
  * also, no warranty of any kind. If it doesn't fit your needs don't whine,
  * or even better fork and fix.
  *
- *
- *
  */
 (function ($) {
-    var _ = {
+    var progLoader = {
         getImgs : function () {
             var doc = document,
                 rexp = /^url(\(['"]?(.*?)['"]?\))/i,
@@ -17,6 +15,7 @@
                 $all = $("*"),
                 docSheets = doc.styleSheets;
 
+            // Find images in DOM nodes
             $all.each(function () {
                 var bgMatch = this.style.backgroundImage.match(rexp);
 
@@ -29,15 +28,15 @@
                 }
             });
 
+            // Find images in stylesheets
             for (var i = 0, l = docSheets.length; i < l; i++) {
                 var sheet = docSheets[i],
-                    rules = sheet[sheet.cssRules ? 'cssRules' : 'rules'],
-                    ll = rules.length;
+                    rules = sheet[sheet.cssRules ? 'cssRules' : 'rules'];
 
-                for (var j = 0; j < ll; j++) {
+                ruleLoop: for (var j = 0, rl = rules.length; j < rl; j++) {
                     var rule = rules[j];
                     if (!rule.style) {
-                        continue;
+                        continue ruleLoop;
                     }
                     var bg = rule.style.backgroundImage;
                     var bgMatch = bg.match(rexp);
@@ -48,11 +47,16 @@
             }
             return images;
         },
-        preload : function (opts) {
+        init : function (opts) {
             var $tempDiv = $('<div />'),
                 imgsLoaded = 0,
                 imgsTimedOut = 0,
-                imgCount = 0;
+                imgCount = 0,
+                progress = {
+                    loaded : 0,
+                    timedOut : 0,
+                    total : 0
+                };
 
             $tempDiv.css({
                 position : 'absolute',
@@ -66,25 +70,35 @@
             function checkProgress() {
                 if ((imgsLoaded + imgsTimedOut) === imgCount) {
                     if (typeof opts.onDone === 'function') {
-                        opts.onDone.call();
+                        opts.onDone(progress);
                     }
                     $tempDiv.remove();
                 }
+            }
+
+            function updateProgress() {
+                this.loaded   = imgsLoaded;
+                this.timedOut = imgsTimedOut;
+                this.total    = imgCount;
+
+                return this;
             }
 
             function createImage(src) {
                 var $img = $('<img />'),
                     timer;
 
-                function triggerChange() {
+                function fireChange() {
                     if (opts.timeout !== 0) {
                         clearTimeout(timer);
                     }
 
                     $img.remove();
 
+                    updateProgress.call(progress);
+
                     if (imgCount > 0 && typeof opts.onChange === 'function') {
-                        opts.onChange.call();
+                        opts.onChange(progress);
                     }
 
                     checkProgress();
@@ -93,14 +107,14 @@
                 if (opts.timeout !== 0) {
                     timer = setTimeout(function () {
                         imgsTimedOut += 1;
-                        triggerChange();
+                        fireChange();
                     }, opts.timeout);
                 }
 
 
                 $img.appendTo($tempDiv).load(function () {
                     imgsLoaded += 1;
-                    triggerChange();
+                    fireChange();
                 }).attr('src', src);
 
             }
@@ -133,8 +147,8 @@
         opts = $.extend(defaults, opts);
 
         if (opts.findImages) {
-            opts.imgs = $.merge(_.getImgs(), opts.imgs);
+            opts.imgs = $.merge(progLoader.getImgs(), opts.imgs);
         }
-        _.preload(opts);
+        progLoader.init(opts);
     };
 })(this.jQuery);

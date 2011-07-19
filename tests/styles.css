@@ -1,1 +1,10 @@
-#css-bg-test{background:url(http://placekitten.com/300?v=9);}
+img{
+border:1px #0F0 solid;
+}
+
+#css-bg-test{
+border:1px #FF0 solid;
+background:url(http://placekitten.com/300?v=9);
+height: 300px;
+width: 300px;
+}

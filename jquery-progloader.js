@@ -5,6 +5,7 @@
  * also, no warranty of any kind. If it doesn't fit your needs don't whine,
  * or even better fork and fix.
  *
+ * http://github.com/edfuh/progLoader
  */
 (function ($) {
     var progLoader = {
@@ -19,7 +20,7 @@
             $all.each(function () {
                 var bgMatch = this.style.backgroundImage.match(rexp);
 
-                if (this.tagName.toUpperCase() === "IMG") {
+                if (this.nodeName === "IMG") {
                     images.push(this.src);
                 }
 
@@ -55,9 +56,17 @@
                 progress = {
                     loaded : 0,
                     timedOut : 0,
-                    total : 0
+                    total : 0,
+                    update : function () {
+                        this.loaded   = imgsLoaded;
+                        this.timedOut = imgsTimedOut;
+                        this.total    = imgCount;
+
+                        return this;
+                    }
                 };
 
+            // Hide offscreen
             $tempDiv.css({
                 position : 'absolute',
                 height   : 1,
@@ -76,14 +85,6 @@
                 }
             }
 
-            function updateProgress() {
-                this.loaded   = imgsLoaded;
-                this.timedOut = imgsTimedOut;
-                this.total    = imgCount;
-
-                return this;
-            }
-
             function createImage(src) {
                 var $img = $('<img />'),
                     timer;
@@ -95,7 +96,7 @@
 
                     $img.remove();
 
-                    updateProgress.call(progress);
+                    progress.update();
 
                     if (imgCount > 0 && typeof opts.onChange === 'function') {
                         opts.onChange(progress);
@@ -141,7 +142,7 @@
                 onStart    : function () {},
                 onChange   : function () {},
                 onDone     : function () {},
-                findImages    : true
+                findImages : true
             };
 
         opts = $.extend(defaults, opts);

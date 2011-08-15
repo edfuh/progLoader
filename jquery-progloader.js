@@ -20,7 +20,7 @@
             $all.each(function () {
                 var bgMatch = this.style.backgroundImage.match(rexp);
 
-                if (this.nodeName === "IMG") {
+                if (this.nodeName === "IMG" && this.src) {
                     images.push(this.src);
                 }
 

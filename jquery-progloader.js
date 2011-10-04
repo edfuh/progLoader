@@ -2,8 +2,6 @@
  * progLoader
  *
  * no copyright. use and abuse at will
- * also, no warranty of any kind. If it doesn't fit your needs don't whine,
- * or even better fork and fix.
  *
  * http://github.com/edfuh/progLoader
  */
